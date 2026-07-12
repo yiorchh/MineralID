@@ -3,7 +3,7 @@
   "short_name": "Mineral ID",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#eef2ef",
-  "theme_color": "#1f3a2e",
+  "background_color": "#f2efe9",
+  "theme_color": "#171614",
   "icons": []
 }

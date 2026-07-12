@@ -5,12 +5,18 @@ const menuBtn = document.getElementById('menuBtn');
 function showScreen(id) {
   screens.forEach(screen => screen.classList.toggle('active', screen.id === id));
   menu.classList.add('hidden');
+  menuBtn.setAttribute('aria-expanded', 'false');
 }
 
 document.querySelectorAll('[data-screen]').forEach(button => {
   button.addEventListener('click', () => showScreen(button.dataset.screen));
 });
-menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
+
+menuBtn.addEventListener('click', () => {
+  const willOpen = menu.classList.contains('hidden');
+  menu.classList.toggle('hidden');
+  menuBtn.setAttribute('aria-expanded', String(willOpen));
+});
 
 let stream = null;
 const video = document.getElementById('video');
@@ -27,10 +33,20 @@ const minerals = [
   'Hematita', 'Magnetita', 'Galena', 'Yeso', 'Feldespato'
 ];
 
+function wait(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
 async function startCamera() {
   if (stream) return true;
 
+  if (!navigator.mediaDevices?.getUserMedia) {
+    status.textContent = 'Este navegador no permite acceder a la cámara.';
+    return false;
+  }
+
   try {
+    status.textContent = 'Solicitando acceso a la cámara…';
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' } },
       audio: false
@@ -39,7 +55,8 @@ async function startCamera() {
     await video.play();
     takeBtn.disabled = false;
     stopBtn.disabled = false;
-    status.textContent = 'Cámara encendida.';
+    startBtn.disabled = true;
+    status.textContent = 'Cámara encendida y lista para capturar.';
     return true;
   } catch (error) {
     status.textContent = 'No fue posible acceder a la cámara. Revisa los permisos y usa HTTPS o localhost.';
@@ -48,12 +65,10 @@ async function startCamera() {
 }
 
 function getRandomIdentification() {
-  const selected = [...minerals]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 3);
-
+  const selected = [...minerals].sort(() => Math.random() - 0.5).slice(0, 3);
   const first = Math.floor(Math.random() * 31) + 50;
-  const second = Math.floor(Math.random() * (96 - first - 5)) + 5;
+  const secondMaximum = Math.max(5, 95 - first);
+  const second = Math.floor(Math.random() * (secondMaximum - 4)) + 5;
   const third = 100 - first - second;
 
   return selected.map((name, index) => ({
@@ -67,34 +82,38 @@ function showMineralIdentification() {
   const [main] = results;
 
   mineralResult.innerHTML = `
-    <h3>Resultado preliminar simulado</h3>
-    <p>El mineral puede ser <strong>${main.name}</strong>.</p>
-    <p>Probabilidades estimadas:</p>
-    <ul>
-      ${results.map(item => `<li><strong>${item.name}:</strong> ${item.probability}%</li>`).join('')}
-    </ul>
-    <small>Este resultado es aleatorio y solo sirve para demostrar el funcionamiento del prototipo.</small>
+    <p class="resultLabel">RESULTADO PRELIMINAR SIMULADO</p>
+    <h3>El mineral puede ser ${main.name}.</h3>
+    <div class="probabilities">
+      ${results.map(item => `
+        <div class="probabilityRow">
+          <div><strong>${item.name}</strong><span>${item.probability}%</span></div>
+          <div class="probabilityTrack"><span style="width: ${item.probability}%"></span></div>
+        </div>
+      `).join('')}
+    </div>
+    <small>Las probabilidades fueron generadas aleatoriamente y no corresponden a un análisis real.</small>
   `;
   mineralResult.classList.remove('hidden');
 
-  return `El mineral puede ser ${main.name}. Las probabilidades simuladas son: ${results
+  return `El mineral puede ser ${main.name}. Las probabilidades simuladas son ${results
     .map(item => `${item.name}, ${item.probability} por ciento`)
     .join('; ')}.`;
 }
 
 function takePhoto() {
   if (!stream || !video.videoWidth || !video.videoHeight) {
-    status.textContent = 'Primero debes encender la cámara.';
+    status.textContent = 'La cámara todavía no está lista.';
     return null;
   }
 
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const context = canvas.getContext('2d');
-  context.drawImage(video, 0, 0);
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
   photo.src = canvas.toDataURL('image/jpeg', 0.92);
   photo.classList.remove('hidden');
-  status.textContent = 'Fotografía capturada y analizada.';
+  status.textContent = 'Fotografía tomada. Análisis simulado completado.';
   return showMineralIdentification();
 }
 
@@ -104,6 +123,7 @@ function stopCamera() {
   video.srcObject = null;
   takeBtn.disabled = true;
   stopBtn.disabled = true;
+  startBtn.disabled = false;
   status.textContent = 'Cámara apagada.';
 }
 
@@ -115,6 +135,7 @@ const chat = document.getElementById('chat');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
 const voiceStatus = document.getElementById('voiceStatus');
+const voiceBtn = document.getElementById('voiceBtn');
 
 function addChatMessage(text, type) {
   const message = document.createElement('div');
@@ -126,54 +147,54 @@ function addChatMessage(text, type) {
 
 function assistantReply(text) {
   const normalized = text.toLowerCase();
-
   if (normalized.includes('preparo') || normalized.includes('muestra') || normalized.includes('limpio')) {
-    return 'Retira el exceso de polvo, observa una superficie fresca y usa iluminación uniforme. No realices pruebas peligrosas.';
+    return 'Retira el exceso de polvo, observa una superficie fresca y utiliza iluminación uniforme. Evita pruebas peligrosas.';
   }
   if (normalized.includes('preliminar')) {
-    return 'Es una primera estimación rápida. Debe confirmarse con un geólogo o laboratorio cuando la decisión sea crítica.';
-  }
-  if (normalized.includes('guante')) {
-    return 'La interfaz utiliza botones grandes. También puedes usar el micrófono para dictar preguntas o pedir que tome una foto.';
+    return 'Es una estimación inicial que debe confirmarse con un geólogo o laboratorio cuando la decisión sea importante.';
   }
   if (normalized.includes('foto') || normalized.includes('cámara') || normalized.includes('camara')) {
-    return 'Puedes decir “toma una foto” al usar el micrófono. El asistente abrirá la cámara, la encenderá y hará una captura.';
+    return 'Di “toma una foto”. Abriré la cámara, capturaré la imagen y generaré el análisis simulado en la misma secuencia.';
   }
   return 'Puedo ayudarte con la cámara, la preparación de la muestra y la identificación preliminar. También puedes decir “toma una foto”.';
 }
 
 function isTakePhotoCommand(text) {
   const normalized = text.toLowerCase();
-  return normalized.includes('toma una foto') ||
-    normalized.includes('tomar una foto') ||
-    normalized.includes('saca una foto') ||
-    normalized.includes('captura una foto');
+  return [
+    'toma una foto', 'tomar una foto', 'tómame una foto', 'saca una foto',
+    'sacar una foto', 'captura una foto', 'haz una foto', 'analiza una foto'
+  ].some(command => normalized.includes(command));
 }
 
-async function executeVoiceCommand(text) {
-  if (!isTakePhotoCommand(text)) return false;
-
-  addChatMessage('Abriendo la cámara para tomar la fotografía…', 'bot');
+async function executePhotoCommand() {
+  stopVoiceRecognition(false);
+  await wait(250);
+  addChatMessage('Entendido. Abriré la cámara, tomaré la fotografía y la analizaré.', 'bot');
   showScreen('camera');
+
   const cameraStarted = await startCamera();
   if (!cameraStarted) {
     addChatMessage('No pude acceder a la cámara. Revisa los permisos del navegador.', 'bot');
-    return true;
+    return;
   }
 
-  await new Promise(resolve => setTimeout(resolve, 1200));
+  status.textContent = 'Preparando captura automática…';
+  await wait(1400);
   const resultText = takePhoto();
   if (resultText) addChatMessage(resultText, 'bot');
-  return true;
 }
 
 async function sendMessage(text) {
   const cleanText = text.trim();
   if (!cleanText) return;
-
   addChatMessage(cleanText, 'user');
-  const commandExecuted = await executeVoiceCommand(cleanText);
-  if (!commandExecuted) addChatMessage(assistantReply(cleanText), 'bot');
+
+  if (isTakePhotoCommand(cleanText)) {
+    await executePhotoCommand();
+  } else {
+    addChatMessage(assistantReply(cleanText), 'bot');
+  }
 }
 
 sendBtn.addEventListener('click', async () => {
@@ -190,50 +211,106 @@ document.querySelectorAll('[data-msg]').forEach(button => {
   button.addEventListener('click', () => sendMessage(button.dataset.msg));
 });
 
-const voiceBtn = document.getElementById('voiceBtn');
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+let recognitionTimeout = null;
+let recognizedText = '';
+
+function updateVoiceInterface(listening, message) {
+  isListening = listening;
+  voiceBtn.classList.toggle('listening', listening);
+  voiceBtn.setAttribute('aria-pressed', String(listening));
+  voiceBtn.setAttribute('aria-label', listening ? 'Detener reconocimiento de voz' : 'Iniciar reconocimiento de voz');
+  voiceBtn.title = listening ? 'Detener reconocimiento de voz' : 'Iniciar reconocimiento de voz';
+  voiceBtn.textContent = listening ? '■' : '🎤';
+  if (message) voiceStatus.textContent = message;
+}
+
+function clearRecognitionTimeout() {
+  if (recognitionTimeout) clearTimeout(recognitionTimeout);
+  recognitionTimeout = null;
+}
+
+function stopVoiceRecognition(showMessage = true) {
+  clearRecognitionTimeout();
+  if (recognition && isListening) {
+    try {
+      recognition.stop();
+    } catch (error) {
+      updateVoiceInterface(false);
+    }
+  }
+  if (showMessage && isListening) voiceStatus.textContent = 'Reconocimiento detenido.';
+}
 
 if (SpeechRecognition) {
-  const recognition = new SpeechRecognition();
+  recognition = new SpeechRecognition();
   recognition.lang = 'es-CL';
   recognition.interimResults = false;
   recognition.continuous = false;
+  recognition.maxAlternatives = 1;
 
   voiceBtn.addEventListener('click', () => {
-    voiceStatus.textContent = 'Escuchando… Puedes decir “toma una foto”.';
-    voiceBtn.disabled = true;
+    if (isListening) {
+      stopVoiceRecognition();
+      return;
+    }
+
+    recognizedText = '';
     try {
       recognition.start();
     } catch (error) {
-      voiceBtn.disabled = false;
+      updateVoiceInterface(false, 'El reconocimiento ya estaba activo. Vuelve a intentarlo.');
     }
   });
 
-  recognition.addEventListener('result', async event => {
-    const text = event.results[0][0].transcript;
-    userInput.value = '';
-    voiceStatus.textContent = `Escuché: “${text}”`;
-    await sendMessage(text);
+  recognition.addEventListener('start', () => {
+    updateVoiceInterface(true, 'Escuchando… Di una instrucción. Pulsa ■ para detener.');
+    clearRecognitionTimeout();
+    recognitionTimeout = setTimeout(() => stopVoiceRecognition(false), 8000);
   });
 
-  recognition.addEventListener('end', () => {
-    voiceBtn.disabled = false;
-    if (voiceStatus.textContent === 'Escuchando… Puedes decir “toma una foto”.') {
+  recognition.addEventListener('result', event => {
+    recognizedText = event.results[event.results.length - 1][0].transcript.trim();
+    voiceStatus.textContent = `Escuché: “${recognizedText}”`;
+    stopVoiceRecognition(false);
+  });
+
+  recognition.addEventListener('end', async () => {
+    clearRecognitionTimeout();
+    updateVoiceInterface(false);
+
+    if (recognizedText) {
+      const textToSend = recognizedText;
+      recognizedText = '';
+      await sendMessage(textToSend);
+    } else if (!voiceStatus.textContent.startsWith('Error') && voiceStatus.textContent.includes('Escuchando')) {
       voiceStatus.textContent = 'No se detectó una instrucción. Inténtalo nuevamente.';
     }
   });
 
   recognition.addEventListener('error', event => {
-    voiceBtn.disabled = false;
-    voiceStatus.textContent = event.error === 'not-allowed'
-      ? 'No se concedió permiso para usar el micrófono.'
-      : 'No pude reconocer la voz. Inténtalo nuevamente.';
+    clearRecognitionTimeout();
+    recognizedText = '';
+    const messages = {
+      'not-allowed': 'No se concedió permiso para usar el micrófono.',
+      'audio-capture': 'No se encontró un micrófono disponible.',
+      'no-speech': 'No se detectó voz. Inténtalo nuevamente.',
+      'network': 'El reconocimiento de voz necesita conexión a internet en este navegador.',
+      'aborted': 'Reconocimiento detenido.'
+    };
+    updateVoiceInterface(false, messages[event.error] || 'Error al reconocer la voz. Inténtalo nuevamente.');
   });
 } else {
   voiceBtn.disabled = true;
-  voiceBtn.title = 'Reconocimiento de voz no compatible en este navegador';
-  voiceStatus.textContent = 'Este navegador no admite reconocimiento de voz.';
+  voiceStatus.textContent = 'Este navegador no admite reconocimiento de voz. Prueba con Chrome en Android o escritorio.';
 }
+
+window.addEventListener('beforeunload', () => {
+  stopVoiceRecognition(false);
+  stopCamera();
+});
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js').catch(() => {});

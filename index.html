@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1f3a2e" />
+  <meta name="theme-color" content="#171614" />
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
   <title>Mineral ID</title>
 </head>
 <body>
   <header>
-    <div class="brand">🪨 Mineral ID</div>
-    <button id="menuBtn" aria-label="Abrir menú">☰</button>
+    <button id="homeLogo" class="brand" data-screen="home" aria-label="Ir al inicio">
+      <img src="mineral-id-logo.png" alt="Logo de Mineral ID" />
+      <span>MINERAL ID</span>
+    </button>
+    <button id="menuBtn" class="menuButton" aria-label="Abrir menú" aria-expanded="false">☰</button>
   </header>
 
-  <nav id="menu" class="hidden">
+  <nav id="menu" class="hidden" aria-label="Navegación principal">
     <button data-screen="home">Inicio</button>
     <button data-screen="camera">Cámara</button>
     <button data-screen="assistant">Asistente</button>
@@ -23,60 +26,69 @@
 
   <main>
     <section id="home" class="screen active">
-      <h1>Bienvenido a Mineral ID</h1>
-      <p>Herramienta de apoyo para la identificación preliminar de minerales en faena.</p>
+      <div class="hero">
+        <img class="heroLogo" src="mineral-id-logo.png" alt="Mineral ID, since 2026" />
+        <p class="eyebrow">IDENTIFICACIÓN PRELIMINAR</p>
+        <h1>Minerales, analizados en terreno.</h1>
+        <p>Captura una muestra y visualiza una identificación simulada con probabilidades generadas al azar.</p>
+      </div>
       <div class="grid">
-        <button class="big" data-screen="camera">📷 Abrir cámara</button>
-        <button class="big" data-screen="assistant">🤖 Asistente</button>
-        <button class="big" data-screen="about">ℹ️ Acerca de</button>
+        <button class="big primary" data-screen="camera">Abrir cámara</button>
+        <button class="big" data-screen="assistant">Hablar con el asistente</button>
+        <button class="big" data-screen="about">Acerca del proyecto</button>
       </div>
     </section>
 
     <section id="camera" class="screen">
+      <p class="eyebrow">CAPTURA Y ANÁLISIS</p>
       <h2>Cámara</h2>
-      <p>Toma una fotografía para generar una identificación simulada.</p>
-      <video id="video" autoplay playsinline></video>
-      <canvas id="canvas" class="hidden"></canvas>
-      <img id="photo" alt="Fotografía capturada" class="hidden" />
+      <p>Al tomar una fotografía, la aplicación genera inmediatamente un reconocimiento mineral simulado.</p>
+      <div class="cameraFrame">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" class="hidden"></canvas>
+        <img id="photo" alt="Fotografía capturada" class="hidden" />
+      </div>
       <div class="actions">
         <button id="startCamera" class="primary">Encender cámara</button>
-        <button id="takePhoto" disabled>Tomar foto</button>
+        <button id="takePhoto" disabled>Tomar y analizar</button>
         <button id="stopCamera" disabled>Apagar cámara</button>
       </div>
       <p id="cameraStatus" class="status" aria-live="polite"></p>
       <div id="mineralResult" class="result hidden" aria-live="polite"></div>
-      <small>La cámara requiere permiso. En algunos teléfonos funciona únicamente desde HTTPS o localhost.</small>
+      <small>Los resultados son aleatorios y únicamente demuestran el funcionamiento del prototipo.</small>
     </section>
 
     <section id="assistant" class="screen">
-      <h2>Asistente virtual</h2>
+      <p class="eyebrow">CONTROL POR VOZ</p>
+      <h2>Asistente</h2>
       <div id="chat" class="chat" aria-live="polite">
-        <div class="bot">Hola. Presiona el micrófono y di “toma una foto” para controlar la cámara con tu voz.</div>
+        <div class="bot">Pulsa el micrófono y di “toma una foto”. El asistente encenderá la cámara, capturará la imagen y mostrará el análisis simulado.</div>
       </div>
       <div class="quick">
-        <button data-msg="Toma una foto">📷 Toma una foto</button>
+        <button data-msg="Toma una foto">Tomar y analizar una foto</button>
         <button data-msg="¿Cómo preparo la muestra?">¿Cómo preparo la muestra?</button>
         <button data-msg="¿Qué significa identificación preliminar?">¿Qué significa identificación preliminar?</button>
       </div>
       <div class="inputRow">
-        <input id="userInput" type="text" placeholder="Escribe o dicta tu pregunta" />
+        <input id="userInput" type="text" placeholder="Escribe o dicta una instrucción" />
         <button id="sendBtn">Enviar</button>
-        <button id="voiceBtn" class="voice" title="Hablar con el asistente" aria-label="Hablar con el asistente">🎤</button>
+        <button id="voiceBtn" class="voice" title="Iniciar reconocimiento de voz" aria-label="Iniciar reconocimiento de voz" aria-pressed="false">🎤</button>
       </div>
-      <p id="voiceStatus" class="voiceStatus" aria-live="polite">Presiona el micrófono para hablar.</p>
+      <p id="voiceStatus" class="voiceStatus" aria-live="polite">Pulsa el micrófono para hablar.</p>
     </section>
 
     <section id="about" class="screen">
-      <h2>Acerca de nosotros</h2>
-      <p><strong>Mineral ID</strong> es un proyecto orientado a apoyar a operarios y supervisores en la identificación preliminar de minerales directamente en faena.</p>
-      <p>Nuestra misión es facilitar decisiones más rápidas mediante una herramienta digital simple, accesible y adaptada al trabajo en terreno.</p>
+      <img class="aboutLogo" src="mineral-id-logo.png" alt="Logo de Mineral ID" />
+      <p class="eyebrow">SINCE 2026</p>
+      <h2>Acerca de Mineral ID</h2>
+      <p>Mineral ID es un prototipo orientado a apoyar la identificación preliminar de muestras minerales directamente en terreno.</p>
       <ul>
-        <li>Interfaz simple y botones grandes.</li>
-        <li>Acceso a cámara y captura por voz.</li>
-        <li>Identificación simulada con probabilidades aleatorias.</li>
-        <li>Asistente con reconocimiento de voz.</li>
+        <li>Captura y análisis simulado en una sola acción.</li>
+        <li>Control de la cámara mediante comandos de voz.</li>
+        <li>Probabilidades aleatorias para demostrar la interfaz.</li>
+        <li>Diseño simple, sobrio y adaptado a dispositivos móviles.</li>
       </ul>
-      <p><strong>Importante:</strong> los resultados son simulados. Esta aplicación no reemplaza a un geólogo, laboratorio o equipo especializado.</p>
+      <p><strong>Importante:</strong> la aplicación no realiza un diagnóstico real ni reemplaza a un geólogo o laboratorio.</p>
     </section>
   </main>
 
