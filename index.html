@@ -55,6 +55,20 @@
       </div>
       <p id="cameraStatus" class="status" aria-live="polite"></p>
       <div id="mineralResult" class="result hidden" aria-live="polite"></div>
+      <button id="consultGeologist" class="consultButton hidden">Tengo dudas: contactar a un geólogo</button>
+
+      <section id="consultationPanel" class="consultationPanel hidden" aria-label="Consulta simulada con un geólogo">
+        <div class="consultationHeader">
+          <div>
+            <p class="resultLabel">REVISIÓN DE ESPECIALISTA</p>
+            <h3>Consulta mineralógica</h3>
+          </div>
+          <button id="closeConsultation" class="closeConsultation" aria-label="Cerrar consulta">×</button>
+        </div>
+        <div id="consultationChat" class="consultationChat" aria-live="polite"></div>
+        <small>Esta conversación también es una simulación y no sustituye una revisión profesional real.</small>
+      </section>
+
       <small>Los resultados son aleatorios y únicamente demuestran el funcionamiento del prototipo.</small>
     </section>
 
