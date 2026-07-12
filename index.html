@@ -34,7 +34,7 @@
 
     <section id="camera" class="screen">
       <h2>Cámara</h2>
-      <p>Permite tomar una fotografía de una muestra mineral.</p>
+      <p>Toma una fotografía para generar una identificación simulada.</p>
       <video id="video" autoplay playsinline></video>
       <canvas id="canvas" class="hidden"></canvas>
       <img id="photo" alt="Fotografía capturada" class="hidden" />
@@ -43,25 +43,27 @@
         <button id="takePhoto" disabled>Tomar foto</button>
         <button id="stopCamera" disabled>Apagar cámara</button>
       </div>
-      <p id="cameraStatus" class="status"></p>
-      <small>La cámara requiere permiso del usuario. En algunos teléfonos funciona solo desde HTTPS o localhost.</small>
+      <p id="cameraStatus" class="status" aria-live="polite"></p>
+      <div id="mineralResult" class="result hidden" aria-live="polite"></div>
+      <small>La cámara requiere permiso. En algunos teléfonos funciona únicamente desde HTTPS o localhost.</small>
     </section>
 
     <section id="assistant" class="screen">
       <h2>Asistente virtual</h2>
-      <div id="chat" class="chat">
-        <div class="bot">Hola. Puedo ayudarte a usar la cámara y preparar una muestra.</div>
+      <div id="chat" class="chat" aria-live="polite">
+        <div class="bot">Hola. Presiona el micrófono y di “toma una foto” para controlar la cámara con tu voz.</div>
       </div>
       <div class="quick">
-        <button data-msg="¿Cómo tomo una foto?">¿Cómo tomo una foto?</button>
+        <button data-msg="Toma una foto">📷 Toma una foto</button>
         <button data-msg="¿Cómo preparo la muestra?">¿Cómo preparo la muestra?</button>
         <button data-msg="¿Qué significa identificación preliminar?">¿Qué significa identificación preliminar?</button>
       </div>
       <div class="inputRow">
-        <input id="userInput" type="text" placeholder="Escribe tu pregunta" />
+        <input id="userInput" type="text" placeholder="Escribe o dicta tu pregunta" />
         <button id="sendBtn">Enviar</button>
-        <button id="voiceBtn" title="Dictar pregunta">🎤</button>
+        <button id="voiceBtn" class="voice" title="Hablar con el asistente" aria-label="Hablar con el asistente">🎤</button>
       </div>
+      <p id="voiceStatus" class="voiceStatus" aria-live="polite">Presiona el micrófono para hablar.</p>
     </section>
 
     <section id="about" class="screen">
@@ -70,11 +72,11 @@
       <p>Nuestra misión es facilitar decisiones más rápidas mediante una herramienta digital simple, accesible y adaptada al trabajo en terreno.</p>
       <ul>
         <li>Interfaz simple y botones grandes.</li>
-        <li>Acceso a cámara.</li>
-        <li>Asistente de ayuda básica.</li>
-        <li>Preparada para incorporar reconocimiento de minerales en el futuro.</li>
+        <li>Acceso a cámara y captura por voz.</li>
+        <li>Identificación simulada con probabilidades aleatorias.</li>
+        <li>Asistente con reconocimiento de voz.</li>
       </ul>
-      <p><strong>Importante:</strong> esta aplicación no reemplaza a un geólogo, laboratorio o equipo especializado.</p>
+      <p><strong>Importante:</strong> los resultados son simulados. Esta aplicación no reemplaza a un geólogo, laboratorio o equipo especializado.</p>
     </section>
   </main>
 
