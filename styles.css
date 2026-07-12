@@ -1,0 +1,51 @@
+
+:root {
+  font-family: Arial, sans-serif;
+  color: #18221d;
+  background: #eef2ef;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; }
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px; background: #1f3a2e; color: white; position: sticky; top: 0;
+}
+.brand { font-size: 1.25rem; font-weight: 700; }
+header button { font-size: 1.5rem; background: transparent; color: white; border: 0; }
+nav {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 6px;
+  padding: 8px; background: #d8e2dc;
+}
+nav button, button {
+  min-height: 52px; border: 0; border-radius: 12px; padding: 10px;
+  font-size: 1rem; cursor: pointer;
+}
+nav button { background: white; }
+.hidden { display: none !important; }
+main { max-width: 760px; margin: auto; padding: 18px; }
+.screen { display: none; }
+.screen.active { display: block; }
+.grid { display: grid; gap: 14px; margin-top: 24px; }
+.big { min-height: 86px; font-size: 1.15rem; background: white; box-shadow: 0 2px 10px #0001; }
+.primary { background: #1f3a2e; color: white; }
+.actions { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 12px; }
+video, #photo {
+  width: 100%; min-height: 240px; background: #111; border-radius: 14px; object-fit: cover;
+}
+.status { min-height: 24px; font-weight: 700; }
+.chat {
+  height: 320px; overflow-y: auto; background: white; padding: 12px;
+  border-radius: 14px; margin-bottom: 12px;
+}
+.bot, .user {
+  max-width: 85%; padding: 10px 12px; margin: 8px 0; border-radius: 12px;
+}
+.bot { background: #e4ece7; }
+.user { background: #cfe2ff; margin-left: auto; }
+.quick { display: grid; gap: 8px; margin-bottom: 12px; }
+.inputRow { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; }
+input { min-height: 50px; border: 1px solid #aaa; border-radius: 10px; padding: 10px; font-size: 1rem; }
+@media (max-width: 540px) {
+  nav { grid-template-columns: 1fr 1fr; }
+  .actions { grid-template-columns: 1fr; }
+}

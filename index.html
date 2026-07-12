@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1f3a2e" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Mineral ID</title>
+</head>
+<body>
+  <header>
+    <div class="brand">🪨 Mineral ID</div>
+    <button id="menuBtn" aria-label="Abrir menú">☰</button>
+  </header>
+
+  <nav id="menu" class="hidden">
+    <button data-screen="home">Inicio</button>
+    <button data-screen="camera">Cámara</button>
+    <button data-screen="assistant">Asistente</button>
+    <button data-screen="about">Acerca de</button>
+  </nav>
+
+  <main>
+    <section id="home" class="screen active">
+      <h1>Bienvenido a Mineral ID</h1>
+      <p>Herramienta de apoyo para la identificación preliminar de minerales en faena.</p>
+      <div class="grid">
+        <button class="big" data-screen="camera">📷 Abrir cámara</button>
+        <button class="big" data-screen="assistant">🤖 Asistente</button>
+        <button class="big" data-screen="about">ℹ️ Acerca de</button>
+      </div>
+    </section>
+
+    <section id="camera" class="screen">
+      <h2>Cámara</h2>
+      <p>Permite tomar una fotografía de una muestra mineral.</p>
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" class="hidden"></canvas>
+      <img id="photo" alt="Fotografía capturada" class="hidden" />
+      <div class="actions">
+        <button id="startCamera" class="primary">Encender cámara</button>
+        <button id="takePhoto" disabled>Tomar foto</button>
+        <button id="stopCamera" disabled>Apagar cámara</button>
+      </div>
+      <p id="cameraStatus" class="status"></p>
+      <small>La cámara requiere permiso del usuario. En algunos teléfonos funciona solo desde HTTPS o localhost.</small>
+    </section>
+
+    <section id="assistant" class="screen">
+      <h2>Asistente virtual</h2>
+      <div id="chat" class="chat">
+        <div class="bot">Hola. Puedo ayudarte a usar la cámara y preparar una muestra.</div>
+      </div>
+      <div class="quick">
+        <button data-msg="¿Cómo tomo una foto?">¿Cómo tomo una foto?</button>
+        <button data-msg="¿Cómo preparo la muestra?">¿Cómo preparo la muestra?</button>
+        <button data-msg="¿Qué significa identificación preliminar?">¿Qué significa identificación preliminar?</button>
+      </div>
+      <div class="inputRow">
+        <input id="userInput" type="text" placeholder="Escribe tu pregunta" />
+        <button id="sendBtn">Enviar</button>
+        <button id="voiceBtn" title="Dictar pregunta">🎤</button>
+      </div>
+    </section>
+
+    <section id="about" class="screen">
+      <h2>Acerca de nosotros</h2>
+      <p><strong>Mineral ID</strong> es un proyecto orientado a apoyar a operarios y supervisores en la identificación preliminar de minerales directamente en faena.</p>
+      <p>Nuestra misión es facilitar decisiones más rápidas mediante una herramienta digital simple, accesible y adaptada al trabajo en terreno.</p>
+      <ul>
+        <li>Interfaz simple y botones grandes.</li>
+        <li>Acceso a cámara.</li>
+        <li>Asistente de ayuda básica.</li>
+        <li>Preparada para incorporar reconocimiento de minerales en el futuro.</li>
+      </ul>
+      <p><strong>Importante:</strong> esta aplicación no reemplaza a un geólogo, laboratorio o equipo especializado.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
