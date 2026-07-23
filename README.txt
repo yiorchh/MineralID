@@ -26,3 +26,9 @@ Limitaciones:
 - No reconoce minerales todavía.
 - El asistente no usa IA generativa; usa respuestas predeterminadas.
 - Es un prototipo académico, no una herramienta de diagnóstico mineralógico.
+
+Controles avanzados de cámara:
+- El botón de flash aparece cuando el navegador expone la capacidad torch.
+- El control de enfoque manual aparece cuando la cámara expone focusDistance y focusMode manual.
+- En iPhone se recomienda usar Safari, HTTPS, la cámara trasera y, de ser posible, instalar la PWA en la pantalla de inicio.
+- La disponibilidad depende de la versión de iOS, Safari y el modelo de cámara; la interfaz informa cuando el control no está disponible.

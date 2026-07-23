@@ -35,6 +35,16 @@ const consultationPanel = document.getElementById('consultationPanel');
 const consultationChat = document.getElementById('consultationChat');
 const consultBtn = document.getElementById('consultGeologist');
 const closeConsultationBtn = document.getElementById('closeConsultation');
+const cameraControls = document.getElementById('cameraControls');
+const flashToggle = document.getElementById('flashToggle');
+const focusControl = document.getElementById('focusControl');
+const focusRange = document.getElementById('focusRange');
+const focusValue = document.getElementById('focusValue');
+const advancedCameraStatus = document.getElementById('advancedCameraStatus');
+
+let videoTrack = null;
+let torchEnabled = false;
+let focusUpdateTimer = null;
 
 const minerals = [
   'Cuarzo', 'Calcita', 'Pirita', 'Calcopirita', 'Malaquita',
@@ -48,6 +58,102 @@ const geologists = [
   'Geólogo Sebastián Araya',
   'Dra. Fernanda Morales'
 ];
+
+
+function isIPhone() {
+  return /iPhone/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1 && window.screen.width < 500);
+}
+
+function resetAdvancedCameraControls() {
+  videoTrack = null;
+  torchEnabled = false;
+  clearTimeout(focusUpdateTimer);
+  focusUpdateTimer = null;
+  flashToggle.disabled = true;
+  flashToggle.textContent = 'Encender flash';
+  flashToggle.setAttribute('aria-pressed', 'false');
+  focusRange.disabled = true;
+  focusControl.classList.add('hidden');
+  cameraControls.classList.add('hidden');
+  advancedCameraStatus.textContent = '';
+  focusValue.textContent = 'Automático';
+}
+
+function configureAdvancedCameraControls() {
+  resetAdvancedCameraControls();
+  videoTrack = stream?.getVideoTracks?.()[0] || null;
+  if (!videoTrack?.getCapabilities) return;
+
+  const capabilities = videoTrack.getCapabilities();
+  const settings = videoTrack.getSettings?.() || {};
+  const supportsTorch = capabilities.torch === true;
+  const supportsManualFocus = Array.isArray(capabilities.focusMode) &&
+    capabilities.focusMode.includes('manual') &&
+    capabilities.focusDistance &&
+    Number.isFinite(capabilities.focusDistance.min) &&
+    Number.isFinite(capabilities.focusDistance.max);
+
+  if (supportsTorch) {
+    flashToggle.disabled = false;
+    cameraControls.classList.remove('hidden');
+  }
+
+  if (supportsManualFocus) {
+    const { min, max, step = 0.01 } = capabilities.focusDistance;
+    focusRange.min = String(min);
+    focusRange.max = String(max);
+    focusRange.step = String(step || 0.01);
+    focusRange.value = String(
+      Number.isFinite(settings.focusDistance) ? settings.focusDistance : min
+    );
+    focusRange.disabled = false;
+    focusControl.classList.remove('hidden');
+    cameraControls.classList.remove('hidden');
+    focusValue.textContent = Number(focusRange.value).toFixed(2);
+  }
+
+  if (!supportsTorch && !supportsManualFocus) {
+    cameraControls.classList.remove('hidden');
+    advancedCameraStatus.textContent = isIPhone()
+      ? 'Safari no expone controles de flash o enfoque manual para esta cámara. Prueba con la cámara trasera y la app instalada desde la pantalla de inicio.'
+      : 'Este dispositivo o navegador no permite controlar el flash ni el enfoque manual.';
+  } else if (isIPhone()) {
+    advancedCameraStatus.textContent = 'Controles disponibles en este iPhone. Su funcionamiento depende de la versión de iOS y de la cámara trasera seleccionada.';
+  }
+}
+
+async function toggleTorch() {
+  if (!videoTrack || flashToggle.disabled) return;
+  const nextState = !torchEnabled;
+
+  try {
+    await videoTrack.applyConstraints({ advanced: [{ torch: nextState }] });
+    torchEnabled = nextState;
+    flashToggle.textContent = torchEnabled ? 'Apagar flash' : 'Encender flash';
+    flashToggle.setAttribute('aria-pressed', String(torchEnabled));
+    advancedCameraStatus.textContent = torchEnabled
+      ? 'Flash encendido.'
+      : 'Flash apagado.';
+  } catch (error) {
+    advancedCameraStatus.textContent = 'No fue posible cambiar el flash en esta cámara.';
+  }
+}
+
+async function applyManualFocus() {
+  if (!videoTrack || focusRange.disabled) return;
+  const distance = Number(focusRange.value);
+  focusValue.textContent = distance.toFixed(2);
+
+  try {
+    await videoTrack.applyConstraints({
+      advanced: [{ focusMode: 'manual', focusDistance: distance }]
+    });
+    advancedCameraStatus.textContent = `Enfoque manual ajustado a ${distance.toFixed(2)}.`;
+  } catch (error) {
+    advancedCameraStatus.textContent = 'No fue posible ajustar el enfoque manual.';
+  }
+}
 
 function wait(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -73,6 +179,7 @@ async function startCamera() {
     });
     video.srcObject = stream;
     await video.play();
+    configureAdvancedCameraControls();
     takeBtn.disabled = false;
     stopBtn.disabled = false;
     startBtn.disabled = true;
@@ -156,9 +263,13 @@ async function takePhoto() {
 }
 
 function stopCamera() {
+  if (torchEnabled && videoTrack) {
+    videoTrack.applyConstraints({ advanced: [{ torch: false }] }).catch(() => {});
+  }
   if (stream) stream.getTracks().forEach(track => track.stop());
   stream = null;
   video.srcObject = null;
+  resetAdvancedCameraControls();
   takeBtn.disabled = true;
   stopBtn.disabled = true;
   startBtn.disabled = false;
@@ -239,6 +350,12 @@ takeBtn.addEventListener('click', takePhoto);
 stopBtn.addEventListener('click', stopCamera);
 consultBtn.addEventListener('click', startGeologistConsultation);
 closeConsultationBtn.addEventListener('click', () => consultationPanel.classList.add('hidden'));
+flashToggle.addEventListener('click', toggleTorch);
+focusRange.addEventListener('input', () => {
+  focusValue.textContent = Number(focusRange.value).toFixed(2);
+  clearTimeout(focusUpdateTimer);
+  focusUpdateTimer = setTimeout(applyManualFocus, 120);
+});
 
 const chat = document.getElementById('chat');
 const userInput = document.getElementById('userInput');

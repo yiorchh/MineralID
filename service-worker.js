@@ -1,4 +1,4 @@
-const CACHE = 'mineral-id-v3';
+const CACHE = 'mineral-id-v4';
 const ASSETS = [
   './', './index.html', './styles.css', './app.js', './manifest.json', './mineral-id-logo.png'
 ];

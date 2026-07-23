@@ -201,3 +201,25 @@ input { min-height: 54px; min-width: 0; border: 1px solid var(--ink); border-rad
 .consultTyping span:nth-child(2) { animation-delay: .2s; }
 .consultTyping span:nth-child(3) { animation-delay: .4s; }
 @keyframes typing { from { opacity: .25; transform: translateY(0); } to { opacity: 1; transform: translateY(-3px); } }
+
+.cameraControls {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid var(--ink);
+  background: var(--white);
+}
+
+.cameraControls > button { width: 100%; }
+.cameraControls > button[aria-pressed="true"] { background: var(--ink); color: var(--white); }
+.focusControl { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.focusControl span { font-weight: 700; }
+.focusControl input[type="range"] { width: 100%; min-height: auto; padding: 0; }
+.focusControl output { min-width: 54px; text-align: right; font-variant-numeric: tabular-nums; }
+.cameraHint { margin: 0; font-size: .88rem; color: var(--muted); }
+
+@media (max-width: 560px) {
+  .focusControl { grid-template-columns: 1fr auto; }
+  .focusControl input[type="range"] { grid-column: 1 / -1; }
+}

@@ -53,6 +53,17 @@
         <button id="takePhoto" disabled>Tomar y analizar</button>
         <button id="stopCamera" disabled>Apagar cámara</button>
       </div>
+
+      <section id="cameraControls" class="cameraControls hidden" aria-label="Controles avanzados de cámara">
+        <button id="flashToggle" type="button" aria-pressed="false" disabled>Encender flash</button>
+        <label id="focusControl" class="focusControl hidden" for="focusRange">
+          <span>Enfoque manual</span>
+          <input id="focusRange" type="range" min="0" max="1" step="0.01" value="0" disabled />
+          <output id="focusValue" for="focusRange">Automático</output>
+        </label>
+        <p id="advancedCameraStatus" class="cameraHint"></p>
+      </section>
+
       <p id="cameraStatus" class="status" aria-live="polite"></p>
       <div id="mineralResult" class="result hidden" aria-live="polite"></div>
       <button id="consultGeologist" class="consultButton hidden">Tengo dudas: contactar a un geólogo</button>
